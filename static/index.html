@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080a12">
+  <meta name="description" content="Hathor AI — shape a feeling into original music.">
+  <title>Hathor AI — Music Generation Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <main id="authView" class="auth-view">
+    <section class="auth-left">
+      <div class="brand brand-large">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+        <span>HATHOR<span class="brand-ai">.AI</span></span>
+      </div>
+      <div class="auth-copy">
+        <div class="eyebrow"><span class="status-dot"></span> GENERATIVE MUSIC LAB <span class="eyebrow-line"></span></div>
+        <h1>Give your<br>imagination a <em>sound.</em></h1>
+        <p class="auth-subtitle">Train a musical mind on MIDI, then turn its new note patterns into sound. Shape your next composition in a personal music lab.</p>
+        <div class="sound-art" aria-hidden="true">
+          <div class="sound-art-orbit orbit-a"></div><div class="sound-art-orbit orbit-b"></div><div class="sound-art-orbit orbit-c"></div>
+          <div class="sound-core"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="art-caption art-caption-left">FEELING → FREQUENCY</div>
+          <div class="art-caption art-caption-right">HATHOR / 01</div>
+          <div class="art-cross cross-a"></div><div class="art-cross cross-b"></div>
+        </div>
+      </div>
+      <div class="auth-foot"><span>ORIGINAL SOUND, MADE PERSONAL</span><span>BUILD 01.26 <b>●</b></span></div>
+    </section>
+
+    <section class="auth-right">
+      <div class="auth-card">
+        <div class="mobile-brand brand">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+          <span>HATHOR<span class="brand-ai">.AI</span></span>
+        </div>
+        <div class="auth-card-top"><span class="tag">WELCOME TO THE STUDIO</span><span class="small-signal">● SYSTEM READY</span></div>
+        <h2>Make something<br><span>you can feel.</span></h2>
+        <p class="auth-note">Sign in to keep your compositions, or step straight into the studio as a guest.</p>
+        <button id="googleLogin" class="auth-button google-button" type="button">
+          <svg class="google-icon" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.27 5.47-4.75 7.16l7.73 6C44.43 38.04 46.98 31.97 46.98 24.55Z"/><path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.2A23.88 23.88 0 0 0 0 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19Z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.82l-7.73-6c-2.14 1.43-4.87 2.27-8.17 2.27-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"/></svg>
+          Continue with Google <span class="button-arrow">↗</span>
+        </button>
+        <button id="guestLogin" class="auth-button guest-button" type="button">
+          <svg class="guest-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.25" r="3.25"/><path d="M5 20v-1.6a7 7 0 0 1 14 0V20Z"/><path d="M4 4.5 2.5 6M20 4.5 21.5 6"/></svg>
+          Continue as a Guest <span class="button-arrow">→</span>
+        </button>
+        <div class="auth-divider"><span></span><small>YOUR SOUND, YOUR SPACE</small><span></span></div>
+        <div class="auth-benefits">
+          <div><span class="benefit-icon">↗</span><span><b>Shape every detail</b><small>Style, mood, tempo & instruments</small></span></div>
+          <div><span class="benefit-icon">◷</span><span><b>Your own music library</b><small>Preview, revisit and download</small></span></div>
+        </div>
+        <p class="auth-legal">By continuing, you agree to use Hathor AI responsibly. Generated results are AI-created and may vary between runs.</p>
+        <div id="authError" class="inline-error" hidden></div>
+      </div>
+      <div class="auth-side-note"><span>◌</span> Every feeling has a frequency.</div>
+    </section>
+  </main>
+
+  <main id="studioView" class="studio-view" hidden>
+    <header class="topbar">
+      <a href="#" class="brand brand-small" id="homeBrand" aria-label="Hathor AI home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+        <span>HATHOR<span class="brand-ai">.AI</span></span>
+      </a>
+      <div class="topbar-center"><span class="status-dot"></span> MUSIC GENERATION STUDIO <span class="build-label">/ BUILD 01</span></div>
+      <div class="topbar-user"><span class="avatar-dot">H</span><span id="userLabel">Composer</span><span class="live-tag">ONLINE</span></div>
+    </header>
+
+    <div class="workspace">
+      <aside class="left-rail">
+        <div class="rail-label">WORKSPACE</div>
+        <button class="rail-item active" data-scroll="composerSection"><span class="rail-glyph">✳</span><span>Composer</span><span class="rail-indicator"></span></button>
+        <button class="rail-item" data-scroll="historySection"><span class="rail-glyph">◷</span><span>My library</span><span id="historyCount" class="rail-count">0</span></button>
+        <div class="rail-rule"></div>
+        <div class="rail-label">QUICK START</div>
+        <button class="preset-item" data-preset="flute"><span class="preset-mini flute-mini">〰</span><span><b>Breath of air</b><small>Flute · Dreamy</small></span><span class="preset-play">↗</span></button>
+        <button class="preset-item" data-preset="cinema"><span class="preset-mini cinema-mini">✦</span><span><b>Final horizon</b><small>Orchestral · Epic</small></span><span class="preset-play">↗</span></button>
+        <button class="preset-item" data-preset="lofi"><span class="preset-mini lofi-mini">▥</span><span><b>After midnight</b><small>Lo-fi · Calm</small></span><span class="preset-play">↗</span></button>
+        <div class="rail-spacer"></div>
+        <div class="model-status"><span class="model-status-icon">◎</span><div><b>Music engine</b><small><i></i> Ready for a prompt</small></div></div>
+        <button id="logoutButton" class="logout-button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg><span>Log out</span></button>
+      </aside>
+
+      <section id="composerSection" class="composer-column">
+        <div class="page-heading"><div><div class="eyebrow"><span class="status-dot"></span> CREATIVE CONTROL</div><h1>Compose <span>your world.</span></h1><p>Shape music with your trained LSTM, then choose how it is played.</p></div><div class="heading-index">01 <span>/</span> 03</div></div>
+        <div class="control-card">
+          <div class="section-head"><div><span class="step-number">01</span><div><h3>Set the atmosphere</h3><p>Start with the feeling. Fine-tune every layer.</p></div></div><span class="head-mark">✳</span></div>
+          <div class="field-grid">
+            <label class="field"><span class="field-label">MUSIC STYLE</span><span class="select-wrap"><select id="genre"><option>Cinematic</option><option>Classical</option><option>Jazz</option><option>Ambient</option><option>Electronic</option><option>Lo-fi</option><option>Orchestral</option><option>Acoustic</option><option>Indian Fusion</option><option>Fantasy</option><option>Neo-soul</option><option>World Music</option></select><span class="select-chevron">⌄</span></span></label>
+            <label class="field"><span class="field-label">EMOTIONAL TONE</span><span class="select-wrap"><select id="mood"><option>Dreamy</option><option>Calm</option><option>Epic</option><option>Joyful</option><option>Melancholic</option><option>Mysterious</option><option>Romantic</option><option>Peaceful</option><option>Dark</option><option>Hopeful</option><option>Spiritual</option><option>Playful</option></select><span class="select-chevron">⌄</span></span></label>
+          </div>
+          <div class="field instrument-field"><div class="field-label-row"><span class="field-label">INSTRUMENTS <span class="optional-label">— PICK UP TO 4</span></span><span id="instrumentSelected" class="selection-count">1 SELECTED</span></div>
+            <div id="instrumentGrid" class="instrument-grid">
+              <label class="instrument-chip selected"><input type="checkbox" name="instrument" value="Flute" checked><span class="chip-icon">♬</span><span>Flute</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Bamboo Flute"><span class="chip-icon">〰</span><span>Bamboo flute</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Piano"><span class="chip-icon">▥</span><span>Piano</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Violin"><span class="chip-icon">♩</span><span>Violin</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Cello"><span class="chip-icon">𝄢</span><span>Cello</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Harp"><span class="chip-icon">⌁</span><span>Harp</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Acoustic Guitar"><span class="chip-icon">♩</span><span>Acoustic guitar</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Electric Guitar"><span class="chip-icon">ϟ</span><span>Electric guitar</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Sitar"><span class="chip-icon">♬</span><span>Sitar</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Veena"><span class="chip-icon">⌁</span><span>Veena</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Tabla"><span class="chip-icon">◉</span><span>Tabla</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Saxophone"><span class="chip-icon">♬</span><span>Saxophone</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Trumpet"><span class="chip-icon">♫</span><span>Trumpet</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Synthesizer"><span class="chip-icon">⌘</span><span>Synthesizer</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Soft Drums"><span class="chip-icon">◍</span><span>Soft drums</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Orchestral Strings"><span class="chip-icon">♩</span><span>Orchestral strings</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Music Box"><span class="chip-icon">✧</span><span>Music box</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Oboe"><span class="chip-icon">♬</span><span>Oboe</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Clarinet"><span class="chip-icon">♬</span><span>Clarinet</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Harmonica"><span class="chip-icon">♫</span><span>Harmonica</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Handpan"><span class="chip-icon">◎</span><span>Handpan</span><span class="chip-check">✓</span></label>
+              <label class="instrument-chip"><input type="checkbox" name="instrument" value="Marimba"><span class="chip-icon">▦</span><span>Marimba</span><span class="chip-check">✓</span></label>
+            </div>
+          </div>
+          <label class="field prompt-field"><span class="field-label">YOUR CREATIVE DIRECTION <span class="optional-label">— OPTIONAL</span></span><textarea id="creativeNotes" rows="3" maxlength="240" placeholder="e.g. A lone flute floating above soft strings, like the first light at the edge of a quiet lake…"></textarea><span class="textarea-meta"><span>Optional note saved with the track; this LSTM does not interpret free text yet.</span><span id="notesCount">0 / 240</span></span></label>
+        </div>
+
+        <div class="control-card adjustments-card">
+          <div class="section-head"><div><span class="step-number">02</span><div><h3>Shape the sound</h3><p>Dial in the pace, movement and length.</p></div></div><span class="head-mark">⌁</span></div>
+          <div class="slider-field"><div class="slider-label"><label for="tempo">TEMPO</label><span class="slider-value"><b id="tempoValue">100</b> <small>BPM</small></span></div><input id="tempo" type="range" min="40" max="200" step="1" value="100"><div class="slider-ends"><span>40 · Slow drift</span><span>200 · Fast pulse</span></div></div>
+          <div class="dual-sliders">
+            <div class="slider-field"><div class="slider-label"><label for="energy">ENERGY</label><span class="slider-value"><b id="energyValue">3</b><small>/ 5</small></span></div><input id="energy" type="range" min="1" max="5" step="1" value="3"><div class="slider-ends"><span>Gentle</span><span>Powerful</span></div></div>
+            <div class="slider-field"><div class="slider-label"><label for="complexity">ARRANGEMENT</label><span class="slider-value"><b id="complexityValue">3</b><small>/ 5</small></span></div><input id="complexity" type="range" min="1" max="5" step="1" value="3"><div class="slider-ends"><span>Minimal</span><span>Layered</span></div></div>
+          </div>
+          <div class="field duration-field"><span class="field-label">COMPOSITION LENGTH</span><div id="durationOptions" class="duration-options"><button type="button" data-duration="8">8 sec</button><button type="button" data-duration="12">12 sec</button><button class="selected" type="button" data-duration="15">15 sec</button><button type="button" data-duration="20">20 sec</button><button type="button" data-duration="25">25 sec</button><button type="button" data-duration="30">30 sec</button></div><p class="field-help">Short compositions are faster to generate. Up to 30 seconds per track in this build.</p></div>
+          <div class="engine-note"><span class="engine-note-icon">✧</span><p><b>Hathor custom LSTM</b><br><span id="engineMessage">Train the model in Colab, upload its weights, and redeploy to enable generation. Styles depend on the MIDI folders used during training.</span></p><span id="engineVersion" class="engine-version">CUSTOM LSTM</span></div>
+        </div>
+        <button id="generateButton" class="generate-button" type="button" disabled><span class="generate-spark">✳</span><span><b>Generate composition</b><small>Turn your direction into sound</small></span><span class="generate-arrow">↗</span></button>
+        <p class="generation-disclaimer">Music notes are generated by your own LSTM and rendered with FluidSynth + a General MIDI SoundFont. Quality depends on your training data; the default training corpus is classical piano.</p>
+      </section>
+
+      <aside class="right-column">
+        <section class="output-card">
+          <div class="output-head"><div><span class="field-label">YOUR SOUND, TAKING SHAPE</span><h2>Listening room<span class="title-dot">.</span></h2></div><span id="outputStatus" class="output-status"><i></i> IDLE</span></div>
+          <div id="emptyListening" class="empty-listening"><div class="empty-art"><div class="empty-orbit"></div><div class="empty-orbit orbit-inner"></div><div class="empty-center">✧</div><div class="empty-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><span class="empty-kicker">A QUIET SPACE, FOR NOW</span><h3>Your next favourite sound<br>starts with a feeling.</h3><p>Choose your instruments and settings, then generate your first composition.</p></div>
+          <div id="loadingPanel" class="loading-panel" hidden><div class="loading-rings"><span></span><span></span><span></span></div><span class="loading-code">COMPOSING / IN PROGRESS</span><h3>Finding the frequency.</h3><p id="loadingMessage">Reading your musical direction…</p><div class="loading-progress"><span></span></div><small>Generation can take a little while. Keep this page open.</small></div>
+          <div id="playerPanel" class="player-panel" hidden>
+            <div class="track-cover"><div class="cover-grid"></div><div class="cover-circle"></div><div class="cover-signal"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><span class="cover-index">H / 001</span><span class="cover-label">GENERATED AUDIO</span></div>
+            <div class="track-details"><div class="track-eyebrow"><span class="status-dot"></span> ORIGINAL COMPOSITION</div><h3 id="trackTitle">Untitled composition</h3><p id="trackSubline">Cinematic · Dreamy · Flute</p><div class="track-chips" id="trackChips"></div></div>
+            <audio id="audioElement" preload="metadata"></audio>
+            <div class="audio-controls">
+              <div class="progress-row"><span id="currentTime">0:00</span><input id="progressBar" type="range" min="0" max="1000" value="0" aria-label="Audio progress"><span id="totalTime">0:00</span></div>
+              <div class="playback-row"><button id="playPause" class="play-pause" type="button" aria-label="Play audio"><svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg id="pauseIcon" viewBox="0 0 24 24" hidden><path d="M7 5h4v14H7zM14 5h4v14h-4z"/></svg></button><div class="playback-label"><b id="playState">READY TO PLAY</b><small>STEREO · MP3 · SOUND­FONT RENDER</small></div><button id="downloadButton" class="download-button" type="button"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3h16v-3"/></svg><span>Download</span></button></div>
+              <div class="player-sliders"><div class="mini-slider"><label for="volume">VOLUME</label><span id="volumeValue">80%</span><input id="volume" type="range" min="0" max="100" value="80"></div><div class="mini-slider speed-slider"><label for="playbackSpeed">PLAYBACK SPEED</label><span id="speedValue">1.00×</span><input id="playbackSpeed" type="range" min="0.25" max="10" step="0.25" value="1"><div class="speed-ends"><span>0.25×</span><span>10×</span></div></div></div>
+            </div>
+            <div class="quality-note"><span>ⓘ</span><p>Volume and speed change playback only; they do not alter the downloaded master file. Very high playback speeds may sound unnatural.</p></div>
+          </div>
+          <div id="outputError" class="output-error" hidden></div>
+        </section>
+        <section id="historySection" class="history-card"><div class="history-head"><div><span class="field-label">YOUR PERSONAL ARCHIVE</span><h3>Recent compositions <span id="historyHeadingCount">(0)</span></h3></div><button id="refreshHistory" class="icon-button" type="button" aria-label="Refresh history">↻</button></div><div id="historyList" class="history-list"><div class="history-empty"><span>◷</span><p>Your generated music will live here.</p><small>Every new take, saved in one place.</small></div></div><div class="history-foot"><span><i></i> PRIVATE LIBRARY</span><span>LAST 30 TRACKS</span></div></section>
+        <div class="right-footer"><span>HATHOR AI <b>·</b> SHAPE THE UNHEARD</span><span>MADE FOR THE MOMENT.</span></div>
+      </aside>
+    </div>
+    <div class="mobile-logout"><button id="mobileLogoutButton" type="button">↗ Log out</button></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/static/config.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
