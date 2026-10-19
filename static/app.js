@@ -4,6 +4,7 @@
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
   const config = window.HATHOR_CONFIG || {};
+  const LOGIN_AUDIT_URL = "https://script.google.com/macros/s/AKfycbyhxQEOmmP_OpBL77tlIhz1Z_JoXDOMJBiSyBgHM9QCB_BleTFwzmBQThFft3LfwRdG/exec";
   const authView = $("#authView");
   const studioView = $("#studioView");
   const authError = $("#authError");
@@ -60,7 +61,69 @@
     }
     refreshHistory({ quiet: true });
   }
+  
+function auditStorageKey(userId) {
+  return `hathor_audit_session_${userId}`;
+}
 
+function createAuditSessionId() {
+  if (window.crypto && typeof window.crypto.randomUUID === "function") {
+    return window.crypto.randomUUID();
+  }
+
+  return "hathor-" + Date.now() + "-" +
+    Math.random().toString(36).slice(2);
+}
+
+async function sendLoginAudit(action, auditSessionId, activeSession) {
+  if (!LOGIN_AUDIT_URL ||
+      LOGIN_AUDIT_URL.includes("PASTE_YOUR_APPS_SCRIPT")) {
+    console.warn("Hathor login audit URL is not configured.");
+    return false;
+  }
+
+  if (!auditSessionId || !activeSession?.access_token) {
+    return false;
+  }
+
+  try {
+    // text/plain avoids a browser CORS preflight for this Apps Script POST.
+    // Apps Script verifies the access token directly with Supabase.
+    await fetch(LOGIN_AUDIT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify({
+        action,
+        session_id: auditSessionId,
+        access_token: activeSession.access_token
+      })
+    });
+
+    // With no-cors, the response is opaque. This confirms only that
+    // fetch completed, not that Apps Script successfully wrote the row.
+    return true;
+  } catch (error) {
+    console.error("Could not send Hathor login audit event:", error);
+    return false;
+  }
+}
+
+async function ensureLoginAudit(activeSession) {
+  const user = activeSession?.user;
+  if (!user?.id) return;
+
+  const key = auditStorageKey(user.id);
+  let auditSessionId = localStorage.getItem(key);
+
+  if (!auditSessionId) {
+    auditSessionId = createAuditSessionId();
+    localStorage.setItem(key, auditSessionId);
+    await sendLoginAudit("login", auditSessionId, activeSession);
+  }
+}
   async function signInWithGoogle() {
     if (!client) return showAuthError("Supabase configuration is not loaded. Check static/config.js.");
     clearAuthError();
@@ -93,19 +156,33 @@
     }
   }
 
-  async function logOut() {
-    if (!client) return;
-    try {
-      const { error } = await client.auth.signOut();
-      if (error) throw error;
-      displaySession(null);
-      clearAuthError();
-      showToast("You have been logged out.");
-    } catch (error) {
-      showToast(error.message || "Could not log out.", "error");
-    }
-  }
+async function logOut() {
+  if (!client) return;
 
+  const activeSession = session;
+  const userId = activeSession?.user?.id;
+  const key = userId ? auditStorageKey(userId) : null;
+  const auditSessionId = key ? localStorage.getItem(key) : null;
+
+  try {
+    // Send the logout event before invalidating the Supabase session.
+    if (auditSessionId && activeSession?.access_token) {
+      await sendLoginAudit("logout", auditSessionId, activeSession);
+    }
+
+    const { error } = await client.auth.signOut();
+    if (error) throw error;
+
+    if (key) localStorage.removeItem(key);
+
+    displaySession(null);
+    clearAuthError();
+    showToast("You have been logged out.");
+  } catch (error) {
+    showToast(error.message || "Could not log out.", "error");
+  }
+}
+  
   async function apiRequest(url, options = {}) {
     if (!session?.access_token) throw new Error("Your session has expired. Please sign in again.");
     const response = await fetch(url, {
@@ -532,14 +609,27 @@
     client = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_PUBLISHABLE_KEY, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
     });
-    client.auth.onAuthStateChange((_event, nextSession) => {
-      // Defer database work to avoid running nested Supabase operations in this callback.
-      window.setTimeout(() => displaySession(nextSession), 0);
-    });
-    const { data, error } = await client.auth.getSession();
-    if (error) console.warn("Supabase session check:", error.message);
-    displaySession(data?.session || null);
-  }
+    
+client.auth.onAuthStateChange((event, nextSession) => {
+  window.setTimeout(() => {
+    displaySession(nextSession);
 
+    if (event === "SIGNED_IN" && nextSession) {
+      ensureLoginAudit(nextSession);
+    }
+  }, 0);
+});
+    
+    const { data, error } = await client.auth.getSession();
+    
+if (error) console.warn("Supabase session check:", error.message);
+
+const currentSession = data?.session || null;
+displaySession(currentSession);
+
+if (currentSession) {
+  ensureLoginAudit(currentSession);
+}
+    
   document.addEventListener("DOMContentLoaded", init);
 })();
