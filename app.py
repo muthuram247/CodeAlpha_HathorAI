@@ -137,18 +137,26 @@ def require_user():
         return None, ("Could not verify your account.", 401)
     return user, None
 
-
 def service_headers(extra: dict | None = None) -> dict:
-    if not SUPABASE_SERVICE_ROLE_KEY:
-        raise RuntimeError("SUPABASE_SERVICE_ROLE_KEY is missing from Render environment settings.")
-    headers = {
-        "apikey": SUPABASE_SERVICE_ROLE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
-    }
+    key = SUPABASE_SERVICE_ROLE_KEY.strip()
+
+    if not key:
+        raise RuntimeError(
+            "SUPABASE_SERVICE_ROLE_KEY is missing from Render environment settings."
+        )
+
+    # New sb_secret_ keys are not JWTs.
+    # Send them through the apikey header only.
+    headers = {"apikey": key}
+
+    # Legacy service_role keys are JWTs and support Bearer authentication.
+    if key.startswith("eyJ"):
+        headers["Authorization"] = f"Bearer {key}"
+
     if extra:
         headers.update(extra)
-    return headers
 
+    return headers
 
 def signed_audio_url(path: str) -> str:
     encoded_path = quote(path, safe="/")
