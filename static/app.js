@@ -616,6 +616,75 @@ async function startGeneration() {
     });
   }
 
+async function initializeModelInfo() {
+  const button = $("#generateButton");
+  const message = $("#engineMessage");
+
+  button.disabled = true;
+
+  try {
+    const response = await fetch("/api/model-info", {
+      cache: "no-store"
+    });
+
+    let info = {};
+    try {
+      info = await response.json();
+    } catch (_) {}
+
+    if (!response.ok) {
+      throw new Error(info.message || "Could not check the music engine.");
+    }
+
+    if (!info.model_ready) {
+      throw new Error(info.message || "The custom LSTM model is not ready.");
+    }
+
+    if (info.soundfont_ready === false) {
+      throw new Error("The audio SoundFont is missing on the server.");
+    }
+
+    const genres = Array.isArray(info.genres)
+      ? info.genres.filter(item => item && item.label)
+      : [];
+
+    if (genres.length === 0) {
+      throw new Error("No trained music styles were found.");
+    }
+
+    // Only display styles the model actually supports.
+    const genreSelect = $("#genre");
+    const previousGenre = genreSelect.value;
+
+    genreSelect.replaceChildren();
+
+    genres.forEach(item => {
+      const option = document.createElement("option");
+      option.value = item.label;
+      option.textContent = item.label;
+      genreSelect.appendChild(option);
+    });
+
+    genreSelect.value = genres.some(
+      item => item.label === previousGenre
+    ) ? previousGenre : genres[0].label;
+
+    message.textContent =
+      "Custom LSTM ready. Available styles: " +
+      genres.map(item => item.label).join(", ");
+
+    $("#engineVersion").textContent = "MODEL READY";
+    button.disabled = false;
+
+  } catch (error) {
+    message.textContent = error.message ||
+      "Could not initialize the music engine.";
+
+    console.error("Hathor model initialization failed:", error);
+    showToast(message.textContent, "error");
+  }
+}
+  
   async function init() {
     bindUi();
     updateInstrumentCount();
@@ -646,6 +715,7 @@ async function startGeneration() {
     if (error) console.warn("Supabase session check:", error.message);
     const currentSession = data?.session || null;
     displaySession(currentSession);
+    await initializeModelInfo();
     if (currentSession) await ensureLoginAudit(currentSession);
   }
 
