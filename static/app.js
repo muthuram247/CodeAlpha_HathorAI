@@ -285,56 +285,75 @@
     showToast(message, "error");
   }
 
-  async function startGeneration() {
-    const options = currentOptions();
-    if (options.instruments.length < 1) return showToast("Choose at least one instrument.", "error");
-    if (options.instruments.length > 4) return showToast("Choose up to four instruments for one composition.", "error");
-    setBusy(true);
-    const stages = [
-      "Reading your musical direction…",
-      "Building the arrangement and musical texture…",
-      "Rendering the audio composition…",
-      "Preparing your private listening copy…"
-    ];
-    let stage = 0;
-    $("#loadingMessage").textContent = stages[0];
-    loadingMessageTimer = window.setInterval(() => {
-      stage = Math.min(stage + 1, stages.length - 1);
-      $("#loadingMessage").textContent = stages[stage];
-    }, 6500);
-    try {
-      const start = await apiRequest("/api/generate", { method: "POST", body: JSON.stringify(options) });
-      if (!start.job_id) throw new Error("The music engine did not return a generation job.");
-      let complete = null;
-      const startTime = Date.now();
-      while (Date.now() - startTime < 5 * 60 * 1000) {
-        await sleep(2400);
-        const state = await apiRequest(`/api/generate/${encodeURIComponent(start.job_id)}`, { method: "GET", headers: { "Content-Type": "application/json" } });
-        if (state.status === "succeeded" && state.record) {
-          complete = state.record;
-          break;
-        }
-        if (state.status === "failed" || state.status === "canceled") throw new Error("The model did not finish this composition. Try again with a shorter duration or a simpler direction.");
-      }
-      if (!complete) throw new Error("This generation is taking longer than expected. Refresh your library later; if the track is missing, try generating it again.");
-      currentRecord = complete;
-      historyRecords = [complete, ...historyRecords.filter((item) => item.id !== complete.id)].slice(0, 30);
-      setBusy(false);
-      setActiveRecord(complete, complete.audio_url, false);
-      renderHistory();
-      showToast("Your composition is ready in the listening room.");
-      // Refresh from Supabase so server-assigned IDs and timestamps are canonical.
-      refreshHistory({ quiet: true });
-    } catch (error) {
-      setBusy(false);
-      showOutputError(error.message || "Something went wrong while generating the track.");
-    } finally {
-      window.clearInterval(loadingMessageTimer);
-      loadingMessageTimer = null;
-      $("#generateButton").disabled = false;
-    }
+async function startGeneration() {
+  const options = currentOptions();
+
+  if (options.instruments.length < 1) {
+    return showToast("Choose at least one instrument.", "error");
   }
 
+  if (options.instruments.length > 4) {
+    return showToast("Choose up to four instruments.", "error");
+  }
+
+  setBusy(true);
+
+  const stages = [
+    "Reading your musical direction…",
+    "Generating note patterns with the custom LSTM…",
+    "Rendering the audio composition…",
+    "Saving your private listening copy…"
+  ];
+
+  let stage = 0;
+  $("#loadingMessage").textContent = stages[0];
+
+  window.clearInterval(loadingMessageTimer);
+  loadingMessageTimer = window.setInterval(() => {
+    stage = Math.min(stage + 1, stages.length - 1);
+    $("#loadingMessage").textContent = stages[stage];
+  }, 6500);
+
+  try {
+    const result = await apiRequest("/api/generate", {
+      method: "POST",
+      body: JSON.stringify(options)
+    });
+
+    // The custom LSTM backend returns the completed track directly.
+    if (result.status !== "succeeded" || !result.record) {
+      throw new Error(
+        result.error || "The music engine returned an unexpected response."
+      );
+    }
+
+    const complete = result.record;
+    currentRecord = complete;
+
+    historyRecords = [
+      complete,
+      ...historyRecords.filter(item => item.id !== complete.id)
+    ].slice(0, 30);
+
+    setBusy(false);
+    setActiveRecord(complete, complete.audio_url, false);
+    renderHistory();
+
+    showToast("Your composition is ready in the listening room.");
+    refreshHistory({ quiet: true });
+
+  } catch (error) {
+    setBusy(false);
+    showOutputError(
+      error.message || "Something went wrong while generating the track."
+    );
+  } finally {
+    window.clearInterval(loadingMessageTimer);
+    loadingMessageTimer = null;
+    $("#generateButton").disabled = false;
+  }
+}
+  
   function formatTime(seconds) {
     if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
     const whole = Math.floor(seconds);
